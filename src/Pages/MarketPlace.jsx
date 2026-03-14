@@ -32,16 +32,23 @@ export default function Marketplace() {
 
       const processed = data.map((property) => {
 
+        // TOTAL SHARES SOLD
         const totalSold =
           property.investments?.reduce(
-            (sum, inv) => sum + inv.fractions_bought,
+            (sum, inv) => sum + (inv.fractions_bought || 0),
             0
           ) || 0;
+
+        // INVESTOR COUNT
+        const investorCount =
+          property.investments?.filter(
+            (inv) => inv.fractions_bought > 0
+          ).length || 0;
 
         return {
           ...property,
           soldShares: totalSold,
-          investorCount: property.investments?.length || 0
+          investorCount: investorCount
         };
 
       });
@@ -56,8 +63,6 @@ export default function Marketplace() {
 
   }
 
-  // SEARCH FILTER
-
   const filtered = opportunities.filter((property) => {
 
     const query = search.toLowerCase();
@@ -69,8 +74,6 @@ export default function Marketplace() {
     );
 
   });
-
-  // ACTIVE PROJECTS ONLY
 
   const activeProjects = filtered.filter(
     (p) => p.funded_status?.toLowerCase().trim() !== "funded"
@@ -147,6 +150,7 @@ export default function Marketplace() {
                   fractionPrice={`FCFA ${property.price_per_share}`}
                   totalInvestment={`FCFA ${property.total_amount}`}
                   totalShares={property.total_shares}
+                  soldShares={property.soldShares}
                   sharesRemaining={property.total_shares - property.soldShares}
                   investorCount={property.investorCount}
                 />
@@ -178,7 +182,7 @@ export default function Marketplace() {
 
       </section>
 
-      {/* START INVESTING CTA */}
+      {/* CTA */}
 
       <section className="bg-green-900 text-white py-20 text-center">
 
